@@ -61,7 +61,7 @@ d = {
 }
 
 ##
-## or an List/Array in the form
+## or a List/Array in the form
 ##
 
 a = [ 
