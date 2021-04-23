@@ -97,7 +97,14 @@ a = [
 ## Compiled regexp(s) used to identify subscripts, apex and bracket pairs.
 ##
 
-subscript_re = re.compile(r"((\[\d+\])+|((\[\"(\w+|\d+)+\"\])+|(\[\'(\w+|\d+)+\'\])+)+)+")
+##
+## LEGAL values for subscript in arrays are numerical characters.
+## LEGAL values for subscript in dict are: alphanumeric characters and spaces.
+##
+## Everything else leads to a KeyError or TypeError exception
+##
+
+subscript_re = re.compile(r"((\[\d+\])+|((\[\"(\w+|\d+|\s*)+\"\])+|(\[\'(\w+|\d+|\s*)+\'\])+)+)+")
 apex_re      = re.compile(r"(^\'|\'$)+|(^\"|\"$)+")
 brackets_re  = re.compile(r"[\[\]]")
 
@@ -218,6 +225,7 @@ def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"
                         obj = obj[k(elem)]
                     else:
                         obj = source[k(elem)]
+                        
                 except KeyError:
                     # Object is null on KeyError    
                     obj = null
