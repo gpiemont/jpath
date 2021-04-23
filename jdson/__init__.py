@@ -218,9 +218,15 @@ def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"
                         obj = obj[k(elem)]
                     else:
                         obj = source[k(elem)]
+                except KeyError:
+                    # Object is null on KeyError    
+                    obj = null
                 except:
                     pass
 
+    except KeyError:    
+        # Object is null on KeyError
+        obj = null
     except Exception as e:
         # Element not found
         # raise e
