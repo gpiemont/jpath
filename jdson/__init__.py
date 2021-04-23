@@ -206,13 +206,13 @@ def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"
             # (0.2) Move to the next element
             #
 
-            if not typelist:
+            if not keytypes:
                 #
                 # Try with string keys, first
                 #
-                typelist = [ str, int ]
+                keytypes = [ str, int ]
 
-            for k in typelist :
+            for k in keytypes:
                 try:
                     if obj != null:
                         obj = obj[k(elem)]
