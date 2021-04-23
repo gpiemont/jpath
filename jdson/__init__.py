@@ -94,7 +94,7 @@ a = [
 ##
 
 ##
-## Compiled regexp to identify subscripts, apex and brackets pairs
+## Compiled regexp(s) used to identify subscripts, apex and bracket pairs.
 ##
 
 subscript_re = re.compile(r"((\[\d+\])+|((\[\"(\w+|\d+)+\"\])+|(\[\'(\w+|\d+)+\'\])+)+)+")
