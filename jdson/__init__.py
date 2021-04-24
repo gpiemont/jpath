@@ -179,7 +179,7 @@ def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"
                         # Object now points to the root element
                         #
 
-                        obj = obj[root] if obj != null else source[obj]
+                        obj = obj[root] if obj != null else source[root]
 
 
                 #
