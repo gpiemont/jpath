@@ -204,6 +204,9 @@ def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"
                     #
                     # Update object with subscripted element
                     #
+                        
+                    if not isinstance(obj, (list, dict)):
+                        raise TypeError(f"'{sc}' : invalid subscript")
                     
                     obj = obj[sc] if obj != null else source[sc]
 
@@ -212,6 +215,8 @@ def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"
             #
             # (0.2) Move to the next element
             #
+            if not isinstance(obj, (list, dict)):
+                raise TypeError(f"'{obj}' : non-subscriptable object")
 
             if not keytypes:
                 #
@@ -232,7 +237,7 @@ def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"
                 except:
                     pass
 
-    except (IndexError, KeyError):
+    except (IndexError, KeyError, TypeError):
         obj = null
     except BaseException as e:
         # Element not found
@@ -256,6 +261,10 @@ def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"
 ##
 
 testlinks = [
+    (d, "test->path[0]->to[0]->object"),
+    (d, "test->path[0]->to[0]->object5"),
+    (d, "test->path[0]->to[0]->object5[7]"),
+    (d, "test->path[0]->to[0]->object5[7][0]"),
     (d, "test->path[0]->to[0]->object"),
     (d, "test->path[0]->to[1][2]"),
     (d, "test->inner"),
