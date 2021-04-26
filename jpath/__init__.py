@@ -30,7 +30,7 @@ import json
 import re
 
 ##
-##  JDSON   : Experimental JSON-Meta accessor and parser
+##  JPath   : Experimental JSON-Meta accessor and parser
 ##
 ##  Access JSON objects via a custom, C-like syntax
 ##
