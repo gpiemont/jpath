@@ -108,7 +108,13 @@ subscript_re = re.compile(r"((\[\d+\])+|((\[\"(\w+|\d+|\s*)+\"\])+|(\[\'(\w+|\d+
 apex_re      = re.compile(r"(^\'|\'$)+|(^\"|\"$)+")
 brackets_re  = re.compile(r"[\[\]]")
 
-def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"}):
+##
+## Default nil value
+##
+
+nil = {"result" : "error"}
+
+def jpath(source: dict, path: str, keytypes=[str, int], null=nil):
 
     """
     Return a value inside a dict/JSON object from a given path specifications.
