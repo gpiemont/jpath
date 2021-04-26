@@ -173,13 +173,14 @@ def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"
                         # Root element name cannot be desumed, probably a pure subscript has been supplied.
                         # Use obj as root element or source, if no obj has been computed.
                         #
-                        obj = source if obj == null else obj[root]
+                        if obj == null:
+                            obj = source
                     else:
                         #
                         # Object now points to the root element
                         #
 
-                        obj = obj[root] if obj != null else source[root]
+                        obj = source[root] if obj == null else obj[root]
 
 
                 #
