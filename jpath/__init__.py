@@ -257,42 +257,67 @@ def jdson(source: dict, path: str, keytypes=[str, int], null={"result" : "error"
 #     pass
 
 ##
-## Test linkset 
+## Testcase linkset
 ##
 
-testlinks = [
-    (d, "test->path[0]->to[0]->object"),
-    (d, "test->path[0]->to[0]->object5"),
-    (d, "test->path[0]->to[0]->object5[7]"),
-    (d, "test->path[0]->to[0]->object5[7][0]"),
-    (d, "test->path[0]->to[0]->object"),
-    (d, "test->path[0]->to[1][2]"),
-    (d, "test->inner"),
+testcases = [
+#
+# Source    Json Link                                  Eval
+#
+    (d,     "test->path[0]->to[0]->object5",           d["test"]["path"][0]["to"][0]["object5"]),
+    (d,     "test->path[0]->to[0]->object5[7]",        nil),
+    (d,     "test->path[0]->to[0]->object5[7][0]",     nil),
+    (d,     "test->path[0]->to[0]->object5->abc",      nil),
+    (d,     "test->path[0]->to[1][2]",                 d["test"]["path"][0]["to"][1][2]),
+    (d,     "test->inner",                             d["test"]["inner"]),
+    (d,     "test['path']",                            d["test"]["path"]),  # Legal, regular syntax
+    (d,     "test[path]",                              nil),  # Illegal, mixes regular and alternate syntax
     ##
     ## Mixed subscripts.
     ##  NOTE ->key and ['key'] are equivalent
     ##
-    (d, "test->path[0]->in[0]->arrays[0]['test']"),
-    (d, "test->path[0]->in[0]->arrays[0]->test"),
-    (d, "['test']['path'][0][\"to\"][0][\"object\"]"),
-    (d, "['test']['path'][0][\"to\"][0]"),
-    (d, "['test']['path'][0]['to']"),
+    (d,     "test->path[0]->in[0]->arrays[0]['test abc']",  nil),
+    (d,     "test->path[0]->in[0]->arrays[0][\"\"]",        nil),
+    (d,     "test->path[0]->in[0]->arrays[1]",              nil),
+    (d,     "test->path[0]->in[0]->arrays[0]->test",        d["test"]["path"][0]["in"][0]["arrays"][0]["test"]),
+    (d,     "['test']['path'][0][\"to\"][0][\"object5\"]",  d["test"]["path"][0]["to"][0]["object5"]),
+    (d,     "['test']['path'][0][\"to\"][0]",               d["test"]["path"][0]["to"][0]),
+    (d,     "['test']['path'][0]['to'][5]",                 nil),
+    (d,     "test->path[5]->in[0]->arrays[0]['test abc']",  nil),
     ##
     ## Pure Array subscript/key access
     ##
-    (a, "[0][1][1]"),
-    (a, "0->1->1"),
-    (a, "0->1"),
-    (a, "9")
+    (a,     "[0][1][1]",                                    a[0][1][1]),
+    (a,     "0->1->1",                                      a[0][1][1]),
+    (a,     "0->1",                                         a[0][1]),
+    (a,     "9",                                            nil)
 ]
 
 if __name__ == "__main__":
 
     print(json.dumps(d, indent=4))
 
-    for source, tl in testlinks:
-        print(f"Rule : {tl}")
-        value = jdson(source, tl)
-        print(f"value = {value}")
+    passed = 0
+    fails  = 0
 
+    total = len(testcases)
+
+    msg = "OK"
+
+    for source, tl, evals in testcases:
+        print(f"[EVAL]  Rule : {tl:<45}", end='')
+
+        value = jpath(source, tl)
+
+        if value == evals:
+            passed += 1
+            msg = "OK"
+        else:
+            fails += 1
+            msg = f"FAIL (value : {value}, expected : {evals}"
+
+        print(f"\t{msg}\n")
+
+    print(f"[RESULT]    Fails  : {fails}/{total}")
+    print(f"[RESULT]    Passed : {passed}/{total}")
 
