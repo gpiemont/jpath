@@ -32,7 +32,7 @@ import re
 ##
 ##  JPath   : Experimental JSON-Meta accessor and parser
 ##
-##  Access JSON objects via a custom, C-like syntax
+##  Access JSON objects via a custom, XPath or C-like syntax 
 ##
 ##  Given a JSON/dict object in the form :
 ##
@@ -117,7 +117,7 @@ brackets_re  = re.compile(r"[\[\]]")
 
 nil = {"result" : "error"}
 
-def jpath(source: dict, path: str, keytypes=[str, int], null=nil):
+def jpath(source: dict, path: str, keytypes=[str, int], null=nil, sep='->'):
 
     """
     Return a value inside a dict/JSON object from a given path specifications.
@@ -139,7 +139,7 @@ def jpath(source: dict, path: str, keytypes=[str, int], null=nil):
     ## Compute components from linkpath
     ##
 
-    elems = path.split("->")
+    elems = path.split(sep)
 
     ##
     ## Initialize object to default 'nil' value
@@ -256,6 +256,16 @@ def jpath(source: dict, path: str, keytypes=[str, int], null=nil):
 
     return obj
 
+def jxpath(source: dict, path: str, keytypes=[str, int], null=nil):
+
+    """
+    Return a value inside a dict/JSON object from a given path specifications, 
+    using a XPath-like syntax
+    
+    """
+    
+    return jpath(source, path, keytypes=keytypes, null=nil, sep='/')
+
 ##
 ## The default programmatic access
 ##
@@ -303,31 +313,45 @@ testcases = [
     (a,     "9",                                            nil)
 ]
 
+testcases_jx = [
+    (d,     "//test/path[0]/in[0]/arrays[0]",                d["test"]["path"][0]["in"][0]["arrays"][0]),
+    (d,     "//test/path[0]/in[0]/arrays[0]/test",           d["test"]["path"][0]["in"][0]["arrays"][0]["test"]),
+    (d,     "//test/path[0]/to[0]",                          d["test"]["path"][0]["to"][0])
+]
+
 if __name__ == "__main__":
 
     print(json.dumps(d, indent=4))
 
     passed = 0
     fails  = 0
-
-    total = len(testcases)
+    value = nil
 
     msg = "OK"
 
-    for source, tl, evals in testcases:
-        print(f"[EVAL]  Rule : {tl:<45}", end='')
+    for testset in (testcases, testcases_jx):
 
-        value = jpath(source, tl)
+        total = len(testset)
 
-        if value == evals:
-            passed += 1
-            msg = "OK"
-        else:
-            fails += 1
-            msg = f"FAIL (value : {value}, expected : {evals}"
+        for source, tl, evals in testset:
+            print(f"[EVAL]  Rule : {tl:<45}", end='')
 
-        print(f"\t{msg}\n")
+            if testset == testcases:
+                value = jpath(source, tl)
+            else:
+                value = jxpath(source, tl)
 
-    print(f"[RESULT]    Fails  : {fails}/{total}")
-    print(f"[RESULT]    Passed : {passed}/{total}")
+            if value == evals:
+                passed += 1
+                msg = "OK"
+            else:
+                fails += 1
+                msg = f"FAIL (value : {value}, expected : {evals}"
+
+            print(f"\t{msg}\n")
+
+        print(f"[RESULT]    Fails  : {fails}/{total}")
+        print(f"[RESULT]    Passed : {passed}/{total}")
+            
+        passed = fails = 0
 
